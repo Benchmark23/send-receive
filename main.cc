@@ -2,6 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <sys/wait.h>
 #include "utils.h"
 #include "receiver.h"
 #include "sender.h"
@@ -17,21 +18,23 @@ int main() {
     
     // cout<<recv_entries.size()<<send_entries.size();
 
-    for (int i = 0; i < recv_entries.size(); ++i) {
+    for (int i = 0; i < recv_entries.size(); ++i)
+    {
         pid_t pid = fork();
         if (pid == 0) { // child process
-            if(recv_entries[i].api=="tcp"){
+            // if(recv_entries[i].api=="tcp"){
                 TCPReceiver receiver;
                 receiver.receive_(8081+i);
-            }
+            // }
             exit(0);
         }
     }
-    
-    for (int i = 0; i < send_entries.size(); ++i) {
+
+    for (int i = 0; i < send_entries.size(); ++i)
+    {
         pid_t pid = fork();
         if (pid == 0) { // child process
-            if(send_entries[i].api=="tcp"){
+            // if(send_entries[i].api=="tcp"){
                 TCPSender sender;
 
                 long long nanoseconds = (long long)(send_entries[i].timestamp* 1000000000);
@@ -41,9 +44,11 @@ int main() {
                 send_util.set_timestamp("results/send_result.log",send_entries[i].id);
 
                 sender.send_(send_entries[i].dst,8081+i,send_entries[i].id);
-            }
+            // }
             exit(0);
         }
     }
+    while (waitpid(-1, NULL, 0) > 0)
+        ;
     return 0;
 }
