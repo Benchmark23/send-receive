@@ -12,19 +12,25 @@
 
 class Sender {
 public:
-    virtual void send_message(std::string dst_ip,int port,std::string message) = 0;
+    virtual void send_(std::string dst_ip,int port,std::string message) = 0;
 };
 
 
-class SocketSender : public Sender {
+class TCPSender : public Sender {
 public:
-    void send_message(std::string dst_ip,int port,std::string message) override;
+    void send_(std::string dst_ip,int port,std::string message) override;
+
+};
+
+class UDPSender : public Sender {
+public:
+    void send_(std::string dst_ip,int port,std::string message) override;
 
 };
 
 class RDMASender : public Sender {
 public:
-    void send_message(std::string dst_ip,int port,std::string message) override;
+    void send_(std::string dst_ip,int port,std::string message) override;
 };
 
 

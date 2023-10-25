@@ -13,17 +13,22 @@
 
 class Receiver {
 public:
-    virtual void receive_message(int port) = 0;
+    virtual void receive_(int port) = 0;
 };
 
-class SocketReceiver : public Receiver {
+class TCPReceiver : public Receiver {
 public:
-    void receive_message(int port) override;
+    void receive_(int port) override;
+};
+
+class UDPReceiver : public Receiver {
+public:
+    void receive_(int port) override;
 };
 
 class RDMAReceiver : public Receiver {
 public:
-    void receive_message(int port) override;
+    void receive_(int port) override;
 };
 
 #endif

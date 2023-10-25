@@ -21,8 +21,8 @@ int main() {
         pid_t pid = fork();
         if (pid == 0) { // child process
             if(recv_entries[i].api=="tcp"){
-                SocketReceiver receiver;
-                receiver.receive_message(8081+i);
+                TCPReceiver receiver;
+                receiver.receive_(8081+i);
             }
             exit(0);
         }
@@ -32,7 +32,7 @@ int main() {
         pid_t pid = fork();
         if (pid == 0) { // child process
             if(send_entries[i].api=="tcp"){
-                SocketSender sender;
+                TCPSender sender;
 
                 long long nanoseconds = (long long)(send_entries[i].timestamp* 1000000000);
                 std::chrono::nanoseconds sleep_time(nanoseconds);
@@ -40,7 +40,7 @@ int main() {
 
                 send_util.set_timestamp("results/send_result.log",send_entries[i].id);
 
-                sender.send_message(send_entries[i].dst,8081+i,send_entries[i].id);
+                sender.send_(send_entries[i].dst,8081+i,send_entries[i].id);
             }
             exit(0);
         }
