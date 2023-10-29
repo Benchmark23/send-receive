@@ -13,22 +13,23 @@
 
 class Receiver {
 public:
-    virtual void receive_(int port) = 0;
 };
 
 class TCPReceiver : public Receiver {
 public:
-    void receive_(int port) override;
+    void accept__(int &connect_socket,int &server_socket,int port);
+    void receive__(int &connect_socket);
+    void disconnect__(int &connect_socket,int &server_socket);
 };
 
 class UDPReceiver : public Receiver {
 public:
-    void receive_(int port) override;
+    void receive__(int port);
 };
 
 class RDMAReceiver : public Receiver {
 public:
-    void receive_(int port) override;
+    void receive__(int port);
 };
 
 #endif
