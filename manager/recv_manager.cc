@@ -8,10 +8,15 @@
 
 int main() {
     
+
     TCPReceiver receiver;
     int connect_socket,server_socket;
     receiver.accept__(connect_socket,server_socket,8081);
-    receiver.receive__(connect_socket);
+
+    while(1){
+        receiver.receive__(connect_socket);
+    }
+
     receiver.disconnect__(connect_socket,server_socket);
     exit(0);
 

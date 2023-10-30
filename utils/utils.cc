@@ -16,14 +16,17 @@ void Utils::parse(const std::string& filename,std::vector<entry> &entries){
         std::getline(file, line);
         e.timestamp = std::stod(line);
         // std::cout<<e.timestamp<<std::endl;
+
         std::getline(file, e.api);
         // std::cout<<e.api<<std::endl;
+
         std::getline(file, e.id);
-        // std::cout<<e.api<<std::endl;
+        // std::cout<<e.id<<std::endl;
+
         std::getline(file, line);
         e.size = std::stoi(line);
+
         entries.push_back(e);
-        // skip empty line
         std::getline(file, line);
     }
 }
