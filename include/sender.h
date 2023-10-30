@@ -6,12 +6,14 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "utils.h"
 
 #ifndef SENDER_H
 #define SENDER_H
 
 class Sender {
 public:
+  std::vector<kv> kvs;
 };
 
 class TCPSender : public Sender {

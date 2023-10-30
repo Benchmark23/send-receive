@@ -18,6 +18,8 @@ void TCPSender::connect__(int &client_socket,std::string dst_ip,int port){
 }
 void TCPSender::send__(int &client_socket,std::string message){
     // std::cout << "Sending data using socket API" << std::endl;
+
+    set_timestamp(message,kvs);
     send(client_socket, message.c_str(), message.size(), 0);
     return;
 }

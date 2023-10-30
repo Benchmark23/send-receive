@@ -13,12 +13,13 @@
 
 class Receiver {
 public:
+   std::vector<kv> kvs;
 };
 
 class TCPReceiver : public Receiver {
 public:
     void accept__(int &connect_socket,int &server_socket,int port);
-    void receive__(int &connect_socket);
+    int receive__(int &connect_socket);
     void disconnect__(int &connect_socket,int &server_socket);
 };
 

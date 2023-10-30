@@ -23,7 +23,7 @@ void UDPReceiver::receive__(int port){
 
     close(server_socket);
 
-    Utils recv;
-    recv.set_timestamp("results/recv_result.log",buffer);
+    // Utils recv;
+    // recv.set_timestamp("results/recv_result.log",buffer);
     return;
 }

@@ -24,12 +24,16 @@ void TCPReceiver::accept__(int &connect_socket,int &server_socket,int port){
         return ;
     }
 }
-void TCPReceiver::receive__(int &connect_socket){
+int TCPReceiver::receive__(int &connect_socket){
     char buffer[256] = {0};
     size_t bytes = recv(connect_socket, buffer, sizeof(buffer), 0);
+
+    set_timestamp(buffer,kvs);
     if(bytes!=0){
         std::cout << "sender says: " << buffer << std::endl;
+        return 1;
     }
+    return 0;
 }
 void TCPReceiver::disconnect__(int &connect_socket,int &server_socket){
     close(server_socket);

@@ -8,10 +8,10 @@
 #include "sender.h"
 int main() {
 
-    Utils send_util;
+    
     std::vector<entry> send_entries;
     std::vector<long long> intvals;
-    send_util.parse("assignment/task_send.log",send_entries);
+    parse("assignment/task_send.log",send_entries);
 
     for(int i = 0; i < send_entries.size(); i++){
         long long nanoseconds;
@@ -24,20 +24,36 @@ int main() {
         intvals.push_back(nanoseconds);
     }
 
-    TCPSender sender;
-    int client_socket;
-    std::chrono::nanoseconds sleep_time(1000000000);
-    sender.connect__(client_socket,"127.0.0.1",8081);
+    TCPSender t_sender;
+    int t_client_socket=0;
+    UDPSender u_sender;
+    
+    t_sender.connect__(t_client_socket,"127.0.0.1",8081);
+
     for(int i=0;i<send_entries.size();i++){
-        if(send_entries[i].api=="tcp"){
-        }
-        else if (send_entries[i].api=="udp"){
-        }
+
         std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        sender.send__(client_socket,send_entries[i].id);
-        
+        t_sender.send__(t_client_socket,send_entries[i].id);
+        // if(send_entries[i].api=="tcp"){
+        //     if(i!=0&&send_entries[i].dst!=send_entries[i-1].dst){
+        //         t_sender.disconnect__(t_client_socket);
+        //     }
+        //     if(t_client_socket==0){
+        //         t_sender.connect__(t_client_socket,"127.0.0.1",8081);
+        //     }
+        //     std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
+        //     t_sender.send__(t_client_socket,send_entries[i].id);
+        // }
+        // else if (send_entries[i].api=="udp"){
+        //     t_sender.disconnect__(t_client_socket);
+        //     std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
+        //     u_sender.send__("127.0.0.1",8081,send_entries[i].id);
+        // }
     }
-    sender.disconnect__(client_socket);
+
+    t_sender.disconnect__(t_client_socket);
+    flush("results/result_send",t_sender.kvs);
+
 
     return 0;
 }
