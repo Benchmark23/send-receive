@@ -6,13 +6,25 @@
 #include "receiver.h"
 #include "sender.h"
 
-int main() {
+int main(int argc, char *argv[]) {
+
+    if (argc != 4)
+    {
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_port>" << std::endl;
+        return 1;
+    }
+
+    std::string taskfile = argv[1];
+    std::string logfile = argv[2];
+
+    int self_port = std::atoi(argv[3]);
+
     std::vector<entry> recv_entries;
-    parse("assignment/task_receive.log",recv_entries);
+    parse(taskfile, recv_entries);
 
     TCPReceiver receiver;
     int connect_socket,server_socket;
-    receiver.accept__(connect_socket,server_socket,8081);
+    receiver.accept__(connect_socket,server_socket,self_port);
 
     int i=0;
     while(i<recv_entries.size()){
@@ -22,8 +34,7 @@ int main() {
     }
     receiver.disconnect__(connect_socket,server_socket);
 
-    flush("results/result_recv",receiver.kvs);
-
+    flush(logfile, receiver.kvs);
 
     return 0;
 }
