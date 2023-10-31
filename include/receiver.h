@@ -13,7 +13,7 @@
 
 class Receiver {
 public:
-   std::vector<kv> kvs;
+   std::vector<log> RL_log;
 };
 
 class TCPReceiver : public Receiver {

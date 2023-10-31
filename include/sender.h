@@ -13,13 +13,14 @@
 
 class Sender {
 public:
-  std::vector<kv> kvs;
+  std::vector<log> SL_log;
+  std::vector<log> SR_log;
 };
 
 class TCPSender : public Sender {
 public:
     void connect__(int &client_socket,std::string dst_ip,int port);
-    void send__(int &client_socket,std::string message);
+    void send__(int &client_socket,std::string id,int len);
     void disconnect__(int &client_socket);
 
 };

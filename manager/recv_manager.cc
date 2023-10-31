@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
     std::vector<entry> recv_entries;
     parse(taskfile, recv_entries);
 
+    
+
     TCPReceiver receiver;
     int connect_socket,server_socket;
     receiver.accept__(connect_socket,server_socket,self_port);
@@ -30,11 +32,12 @@ int main(int argc, char *argv[]) {
     while(i<recv_entries.size()){
         if(receiver.receive__(connect_socket)==1){
             i++;
+            std::cout<<i<<std::endl;
         }
     }
     receiver.disconnect__(connect_socket,server_socket);
 
-    flush(logfile, receiver.kvs);
+    flush(logfile,"RL",receiver.RL_log);
 
     return 0;
 }

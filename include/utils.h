@@ -12,18 +12,30 @@
 #define UTILS_H
 
 struct entry{
-    std::string src;
-    std::string dst;
-    double timestamp;
-    std::string api;
     std::string id;
+    long long timestamp;
+
+    std::string src_ip;
+    std::string dst_ip;
+    
+    int src_port;
+    int dst_port;
+    
+    std::string api;
     int size;
 };
 
-struct kv{
+struct log{
+    // std::string id;
+    // int cpu;
+    // uint64_t tsc;
     std::string id;
-    int cpu;
-    uint64_t tsc;
+    long long timestamp;
+    std::string ip;
+    int port;
+    std::string protocol;
+    int len;
+
 };
 static inline uint64_t rdtsc(void)
 {
@@ -41,36 +53,55 @@ static inline void parse(const std::string& filename,std::vector<entry> &entries
     std::string line;
     while (std::getline(file, line)) {
         entry e;
-        e.src = line.substr(0, line.find(' '));
-        e.dst = line.substr(line.find(' ') + 1);
-        // std::cout<<e.src<<" "<<e.dst<<std::endl;
-        std::getline(file, line);
-        e.timestamp = std::stod(line);
-        // std::cout<<e.timestamp<<std::endl;
-        std::getline(file, e.api);
-        // std::cout<<e.api<<std::endl;
-        std::getline(file, e.id);
+        std::stringstream ss(line);
+        std::string type;
+        ss>>type;
+
+        ss>>e.id;
         // std::cout<<e.id<<std::endl;
-        std::getline(file, line);
-        e.size = std::stoi(line);
+        ss>>e.timestamp;
+        // std::cout<<e.timestamp<<std::endl;
+        ss>>e.src_ip;
+        // std::cout<<e.src_ip<<std::endl;
+        ss>>e.dst_ip;
+        // std::cout<<e.dst_ip<<std::endl;
+        ss>>e.src_port;
+        // std::cout<<e.src_port<<std::endl;
+        ss>>e.dst_port;
+        // std::cout<<e.dst_port<<std::endl;
+        ss>>e.api;
+        // std::cout<<e.api<<std::endl;
+        ss>>e.size;
+        // std::cout<<e.size<<std::endl;
         entries.push_back(e);
-        std::getline(file, line);
     }
 }
-static inline void set_timestamp(std::string id,std::vector<kv> &kvs){
-     kv tmp;
+static inline void set_timestamp(std::string id,std::string ip,int port,std::string protocol,int len,std::vector<log> &logs){
+    
+    log tmp;
     tmp.id=id;
-    tmp.cpu = sched_getcpu();
-    tmp.tsc = rdtsc();
-    kvs.push_back(tmp);
+    // tmp.cpu = sched_getcpu();
+    // tmp.tsc = rdtsc();
+    tmp.ip=ip;
+    tmp.port=port;
+    tmp.protocol=protocol;
+    tmp.len=len;
+
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    tmp.timestamp=timestamp;
+
+    logs.push_back(tmp);
+
 }
 
-static inline void flush(std::string filename,std::vector<kv> kvs){
+static inline void flush(std::string filename,std::string log_type,std::vector<log> logs){
     std::ofstream file(filename, std::ios_base::app);
         if (file.is_open()) {
-
-            for(int i = 0;i < kvs.size(); i++){
-                file << kvs[i].id<< kvs[i].cpu <<" " << kvs[i].tsc << "\n";
+            for(int i = 0;i < logs.size(); i++){
+                file <<log_type<<" "<<logs[i].id<<" "<<logs[i].timestamp<<" "
+                <<logs[i].ip<<" "<<logs[i].port<<" "<<logs[i].protocol<<" "<<logs[i].len<<"\n";
             }
             file.close();
         }

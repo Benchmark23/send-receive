@@ -16,11 +16,15 @@ void TCPSender::connect__(int &client_socket,std::string dst_ip,int port){
     }
     return;
 }
-void TCPSender::send__(int &client_socket,std::string message){
+void TCPSender::send__(int &client_socket,std::string id,int len){
     // std::cout << "Sending data using socket API" << std::endl;
+    std::string all = id;
+    all.append(len-36,'1');
 
-    set_timestamp(message,kvs);
-    send(client_socket, message.c_str(), message.size(), 0);
+    set_timestamp(id,"127.0.0.1",8080,"tcp",len,SL_log);
+    // send(client_socket, all.c_str(), all.size(), 0);
+    send(client_socket, id.c_str(), id.size(), 0);
+    set_timestamp(id,"127.0.0.1",8080,"tcp",len,SR_log);
     return;
 }
 void TCPSender::disconnect__(int &client_socket){

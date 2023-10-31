@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
             nanoseconds=0;
         }
         else{
-            nanoseconds=(long long)((send_entries[i].timestamp-send_entries[i-1].timestamp)*1000000000);
+            nanoseconds=(long long)(send_entries[i].timestamp-send_entries[i-1].timestamp);
         }
         intvals.push_back(nanoseconds);
     }
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     for(int i=0;i<send_entries.size();i++){
 
         std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        t_sender.send__(t_client_socket,send_entries[i].id);
+        t_sender.send__(t_client_socket,send_entries[i].id,send_entries[i].size);
         // if(send_entries[i].api=="tcp"){
         //     if(i!=0&&send_entries[i].dst!=send_entries[i-1].dst){
         //         t_sender.disconnect__(t_client_socket);
@@ -65,7 +65,11 @@ int main(int argc, char *argv[])
     }
 
     t_sender.disconnect__(t_client_socket);
-    flush(logfile, t_sender.kvs);
+
+    flush(logfile,"SL", t_sender.SL_log);
+    flush(logfile,"SR", t_sender.SR_log);
+    
+
 
     return 0;
 }
