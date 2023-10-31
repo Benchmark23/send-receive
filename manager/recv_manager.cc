@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
     }
     receiver.disconnect__(connect_socket,server_socket);
 
+    std::this_thread::sleep_for(std::chrono::nanoseconds(1000000000));
     flush(logfile,"RL",receiver.RL_log);
 
     return 0;

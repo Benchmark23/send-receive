@@ -69,7 +69,5 @@ int main(int argc, char *argv[])
     flush(logfile,"SL", t_sender.SL_log);
     flush(logfile,"SR", t_sender.SR_log);
     
-
-
     return 0;
 }
