@@ -13,6 +13,7 @@
 
 class Sender {
 public:
+  std::string ip;
   std::vector<log> SL_log;
   std::vector<log> SR_log;
 };

@@ -30,7 +30,7 @@ int TCPReceiver::receive__(int &connect_socket){
    
     if(bytes!=0){
         std::string extractedString(buffer, 36);
-        set_timestamp(extractedString,"127.0.0.1",8081,"tcp",bytes,RL_log);
+        set_timestamp(extractedString,this->ip,8081,"tcp",bytes,RL_log);
         // std::cout << "sender says: " << buffer << std::endl;
         return 1;
     }

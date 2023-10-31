@@ -13,6 +13,7 @@
 
 class Receiver {
 public:
+   std::string ip;
    std::vector<log> RL_log;
 };
 

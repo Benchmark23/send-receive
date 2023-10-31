@@ -9,18 +9,19 @@
 int main(int argc, char *argv[])
 {
 
-    if (argc != 6)
+    if (argc != 7)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <target_ip> <self_port> <target_port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port>" << std::endl;
         return 1;
     }
 
     std::string taskfile = argv[1];
     std::string logfile = argv[2];
-    std::string target_ip = argv[3];
+    std::string self_ip = argv[3];
 
-    int self_port = std::atoi(argv[4]);
-    int target_port = std::atoi(argv[5]);
+    std::string target_ip = argv[4];
+    int self_port = std::atoi(argv[5]);
+    int target_port = std::atoi(argv[6]);
 
     std::vector<entry> send_entries;
     std::vector<long long> intvals;
@@ -38,9 +39,11 @@ int main(int argc, char *argv[])
     }
 
     TCPSender t_sender;
+    t_sender.ip=self_ip;
+
     int t_client_socket=0;
     UDPSender u_sender;
-    
+
     t_sender.connect__(t_client_socket, target_ip, target_port);
 
     for(int i=0;i<send_entries.size();i++){
