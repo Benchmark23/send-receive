@@ -6,7 +6,7 @@
 #include "receiver.h"
 #include "sender.h"
 void thread_function(std::vector<entry> recv_entries,
-    std::string self_ip , int self_port , std::string logfile) {
+    std::string self_ip , int self_port , std::string logfile, int total_time) {
 
     cpu_set_t mask;
     CPU_ZERO(&mask);
@@ -24,12 +24,14 @@ void thread_function(std::vector<entry> recv_entries,
     while(1){
 
         receiver.receive__(connect_socket);
-        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start_time).count() > 5) {  // 5 秒后停止
+        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start_time).count() > total_time) {  // 5 秒后停止
             break;
         }
     }
 
     receiver.disconnect__(connect_socket,server_socket);
+    // receiver.cycle_to_time(1000000000);
+
     flush(logfile,"RL",receiver.RL_log);
 }
 
@@ -50,7 +52,7 @@ int main(int argc, char *argv[]) {
     std::vector<entry> recv_entries;
     parse(taskfile, recv_entries);
 
-    std::thread t(thread_function,recv_entries,self_ip,self_port,logfile);
+    std::thread t(thread_function,recv_entries,self_ip,self_port,logfile,5);
     t.join();
 
     return 0;

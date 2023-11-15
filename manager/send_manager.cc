@@ -33,6 +33,7 @@ void thread_function(std::vector<entry> send_entries,
 
     t_sender.disconnect__(t_client_socket);
 
+    // t_sender.cycle_to_time(1000000000);
     flush(logfile,"SL", t_sender.SL_log);
     flush(logfile,"SR", t_sender.SR_log);
 }

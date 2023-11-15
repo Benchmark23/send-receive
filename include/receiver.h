@@ -23,6 +23,7 @@ public:
     int receive__(int &connect_socket);
     void disconnect__(int &connect_socket,int &server_socket);
     void init_log(std::vector<entry> &entries);
+    void cycle_to_time(int hz);
 };
 
 class UDPReceiver : public Receiver {

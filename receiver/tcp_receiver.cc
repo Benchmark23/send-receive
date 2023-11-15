@@ -56,3 +56,11 @@ void TCPReceiver::init_log(std::vector<entry> &entries){
         
     }
 }
+void TCPReceiver::cycle_to_time(int hz){
+    for(std::map<std::string, log>::iterator it=RL_log.begin();it!=RL_log.end();it++){
+
+        long long cycle = it->second.timestamp;
+        double second = cycle / hz;
+        it->second.timestamp = second * 1000000000 ;
+    }
+}

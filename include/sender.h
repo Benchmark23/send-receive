@@ -24,6 +24,7 @@ public:
     void send__(int &client_socket,std::string id,int len);
     void disconnect__(int &client_socket);
     void init_log(std::vector<entry> &entries);
+    void cycle_to_time(int hz);
 
 };
 
