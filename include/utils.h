@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include <thread>
 #include <sched.h>
 
 #ifndef UTILS_H
@@ -80,20 +81,16 @@ static inline void parse(const std::string& filename,std::vector<entry> &entries
 static inline void set_timestamp(std::string id,std::map<std::string, log> &logs){
     
 
-    auto now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    // auto now = std::chrono::high_resolution_clock::now();
+    // auto duration = now.time_since_epoch();
+    // long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
    
-    logs[id].timestamp = timestamp;
+    logs[id].timestamp = rdtsc();
 }
 
 static inline void flush(std::string filename,std::string log_type,std::map<std::string, log> &logs){
     std::ofstream file(filename, std::ios_base::app);
         if (file.is_open()) {
-            // for(int i = 0;i < logs.size(); i++){
-            //     file <<log_type<<" "<<logs[i].id<<" "<<logs[i].timestamp<<" "
-            //     <<logs[i].ip<<" "<<logs[i].port<<" "<<logs[i].protocol<<" "<<logs[i].len<<"\n";
-            // }
             for(std::map<std::string, log>::iterator it=logs.begin();it!=logs.end();it++){
 
                 file <<log_type<<" "<<it->first<<" "<<it->second.timestamp<<" "

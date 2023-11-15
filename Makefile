@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Iinclude
+CFLAGS = -Iinclude -O2
 DEPS = $(wildcard include/*.h)
 
 OBJ1 = $(patsubst %.cc,%.o,$(wildcard receiver/*.cc) )
