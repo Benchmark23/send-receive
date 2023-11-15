@@ -30,7 +30,7 @@ int TCPReceiver::receive__(int &connect_socket){
    
     if(bytes!=0){
         std::string extractedString(buffer, 36);
-        set_timestamp(extractedString,this->ip,8081,"tcp",bytes,RL_log);
+        set_timestamp(extractedString,RL_log);
         // std::cout << "sender says: " << buffer << std::endl;
         return 1;
     }
@@ -39,4 +39,20 @@ int TCPReceiver::receive__(int &connect_socket){
 void TCPReceiver::disconnect__(int &connect_socket,int &server_socket){
     close(server_socket);
     close(connect_socket);
+}
+
+
+void TCPReceiver::init_log(std::vector<entry> &entries){
+    for(int i = 0;i < entries.size(); i++){
+        log rl_log_entry;
+        rl_log_entry.timestamp=0;
+        rl_log_entry.ip = this->ip;
+        rl_log_entry.port = entries[i].dst_port;
+        rl_log_entry.protocol = entries[i].api;
+        rl_log_entry.len = entries[i].size;
+
+        // RL_log[entries[i].id] = rl_log_entry;
+        RL_log.insert(std::make_pair(entries[i].id,rl_log_entry));
+        
+    }
 }

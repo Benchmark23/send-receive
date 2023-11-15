@@ -27,6 +27,11 @@ int main(int argc, char *argv[])
     std::vector<long long> intvals;
     parse(taskfile, send_entries);
 
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+    sched_setaffinity(0, sizeof(mask), &mask);
+
     for(int i = 0; i < send_entries.size(); i++){
         long long nanoseconds;
         if(i==0){
@@ -40,6 +45,7 @@ int main(int argc, char *argv[])
 
     TCPSender t_sender;
     t_sender.ip=self_ip;
+    t_sender.init_log(send_entries);
 
     int t_client_socket=0;
     UDPSender u_sender;

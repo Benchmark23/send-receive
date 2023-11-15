@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <sstream>
 #include <chrono>
@@ -29,7 +30,7 @@ struct log{
     // std::string id;
     // int cpu;
     // uint64_t tsc;
-    std::string id;
+    // std::string id;
     long long timestamp;
     std::string ip;
     int port;
@@ -76,32 +77,27 @@ static inline void parse(const std::string& filename,std::vector<entry> &entries
         entries.push_back(e);
     }
 }
-static inline void set_timestamp(std::string id,std::string ip,int port,std::string protocol,int len,std::vector<log> &logs){
+static inline void set_timestamp(std::string id,std::map<std::string, log> &logs){
     
-    log tmp;
-    tmp.id=id;
-    // tmp.cpu = sched_getcpu();
-    // tmp.tsc = rdtsc();
-    tmp.ip=ip;
-    tmp.port=port;
-    tmp.protocol=protocol;
-    tmp.len=len;
 
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = now.time_since_epoch();
     long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-    tmp.timestamp=timestamp;
-
-    logs.push_back(tmp);
-
+   
+    logs[id].timestamp = timestamp;
 }
 
-static inline void flush(std::string filename,std::string log_type,std::vector<log> logs){
+static inline void flush(std::string filename,std::string log_type,std::map<std::string, log> &logs){
     std::ofstream file(filename, std::ios_base::app);
         if (file.is_open()) {
-            for(int i = 0;i < logs.size(); i++){
-                file <<log_type<<" "<<logs[i].id<<" "<<logs[i].timestamp<<" "
-                <<logs[i].ip<<" "<<logs[i].port<<" "<<logs[i].protocol<<" "<<logs[i].len<<"\n";
+            // for(int i = 0;i < logs.size(); i++){
+            //     file <<log_type<<" "<<logs[i].id<<" "<<logs[i].timestamp<<" "
+            //     <<logs[i].ip<<" "<<logs[i].port<<" "<<logs[i].protocol<<" "<<logs[i].len<<"\n";
+            // }
+            for(std::map<std::string, log>::iterator it=logs.begin();it!=logs.end();it++){
+
+                file <<log_type<<" "<<it->first<<" "<<it->second.timestamp<<" "
+                <<it->second.ip<<" "<<it->second.port<<" "<<it->second.protocol<<" "<<it->second.len<<"\n";
             }
             file.close();
         }

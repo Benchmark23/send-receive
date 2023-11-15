@@ -14,7 +14,7 @@
 class Receiver {
 public:
    std::string ip;
-   std::vector<log> RL_log;
+   std::map<std::string, log> RL_log;
 };
 
 class TCPReceiver : public Receiver {
@@ -22,6 +22,7 @@ public:
     void accept__(int &connect_socket,int &server_socket,int port);
     int receive__(int &connect_socket);
     void disconnect__(int &connect_socket,int &server_socket);
+    void init_log(std::vector<entry> &entries);
 };
 
 class UDPReceiver : public Receiver {

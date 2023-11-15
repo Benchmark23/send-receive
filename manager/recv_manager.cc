@@ -25,8 +25,14 @@ int main(int argc, char *argv[]) {
 
     
 
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(1, &mask);
+    sched_setaffinity(0, sizeof(mask), &mask);
+
     TCPReceiver receiver;
     receiver.ip=self_ip;
+    receiver.init_log(recv_entries);
 
     int connect_socket,server_socket;
     receiver.accept__(connect_socket,server_socket,self_port);
