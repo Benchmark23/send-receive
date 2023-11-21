@@ -15,6 +15,8 @@ class Receiver {
 public:
    std::string ip;
    std::map<std::string, log> RL_log;
+   void init_log(std::vector<entry> &entries);
+   void cycle_to_time(long long start,int hz);
 };
 
 class TCPReceiver : public Receiver {
@@ -22,8 +24,6 @@ public:
     void accept__(int &connect_socket,int &server_socket,int port);
     int receive__(int &connect_socket);
     void disconnect__(int &connect_socket,int &server_socket);
-    void init_log(std::vector<entry> &entries);
-    void cycle_to_time(int hz);
 };
 
 class UDPReceiver : public Receiver {

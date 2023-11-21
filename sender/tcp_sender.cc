@@ -32,7 +32,7 @@ void TCPSender::disconnect__(int &client_socket){
     return;
 }
 
-void TCPSender::init_log(std::vector<entry> &entries){
+void Sender::init_log(std::vector<entry> &entries){
 
     for(int i = 0;i < entries.size(); i++){
         log sl_log_entry;
@@ -49,19 +49,31 @@ void TCPSender::init_log(std::vector<entry> &entries){
         SR_log.insert(std::make_pair(entries[i].id,sl_log_entry));
     }
 }
-void TCPSender::cycle_to_time(int hz){
+void Sender::cycle_to_time(long long start,int hz){
+
+    std::map<std::string, log>::iterator first_sl = SL_log.begin();
+    std::map<std::string, log>::iterator first_sr = SR_log.begin();
+    long long init_cycle_sl = first_sl->second.timestamp;
+     long long init_cycle_sr = first_sr->second.timestamp;
+
     for(std::map<std::string, log>::iterator it=SL_log.begin();it!=SL_log.end();it++){
 
+        // long long cycle = it->second.timestamp;
+        // double second = cycle / hz;
+        // it->second.timestamp = second * 1000000000;
         long long cycle = it->second.timestamp;
-        double second = cycle / hz;
-        it->second.timestamp = second * 1000000000;
+        
+        it->second.timestamp = start + cycle - init_cycle_sl;
     }
 
     for(std::map<std::string, log>::iterator it=SR_log.begin();it!=SR_log.end();it++){
 
+        // long long cycle = it->second.timestamp;
+        // double second = (double)(cycle / (double)hz);
+        // std::cout<<second<<std::endl;
+        // it->second.timestamp = second * 1000000000;
         long long cycle = it->second.timestamp;
-        double second = (double)(cycle / (double)hz);
-        std::cout<<second<<std::endl;
-        it->second.timestamp = second * 1000000000;
+       
+        it->second.timestamp = start + cycle - init_cycle_sr;
     }
 }

@@ -42,7 +42,7 @@ void TCPReceiver::disconnect__(int &connect_socket,int &server_socket){
 }
 
 
-void TCPReceiver::init_log(std::vector<entry> &entries){
+void Receiver::init_log(std::vector<entry> &entries){
     for(int i = 0;i < entries.size(); i++){
         log rl_log_entry;
         rl_log_entry.timestamp=0;
@@ -56,11 +56,17 @@ void TCPReceiver::init_log(std::vector<entry> &entries){
         
     }
 }
-void TCPReceiver::cycle_to_time(int hz){
+void Receiver::cycle_to_time(long long start,int hz){
+    std::map<std::string, log>::iterator first_rl = RL_log.begin();
+    long long init_cycle = first_rl->second.timestamp;
+
     for(std::map<std::string, log>::iterator it=RL_log.begin();it!=RL_log.end();it++){
 
+        // long long cycle = it->second.timestamp;
+        // double second = cycle / hz;
+        // it->second.timestamp = second * 1000000000 ;
         long long cycle = it->second.timestamp;
-        double second = cycle / hz;
-        it->second.timestamp = second * 1000000000 ;
+
+        it->second.timestamp = start + cycle - init_cycle;
     }
 }

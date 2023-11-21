@@ -24,6 +24,10 @@ void thread_function(std::vector<entry> send_entries,
     UDPSender u_sender;
 
     t_sender.connect__(t_client_socket, target_ip, target_port);
+    
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
     for(int i=0;i<send_entries.size();i++){
 
@@ -33,7 +37,7 @@ void thread_function(std::vector<entry> send_entries,
 
     t_sender.disconnect__(t_client_socket);
 
-    // t_sender.cycle_to_time(1000000000);
+    t_sender.cycle_to_time(timestamp,1000000000);
     flush(logfile,"SL", t_sender.SL_log);
     flush(logfile,"SR", t_sender.SR_log);
 }

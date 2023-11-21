@@ -18,7 +18,12 @@ void thread_function(std::vector<entry> recv_entries,
     receiver.init_log(recv_entries);
 
     int connect_socket,server_socket;
+    
     receiver.accept__(connect_socket,server_socket,self_port);
+
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
     auto start_time = std::chrono::steady_clock::now();
     while(1){
@@ -30,7 +35,7 @@ void thread_function(std::vector<entry> recv_entries,
     }
 
     receiver.disconnect__(connect_socket,server_socket);
-    // receiver.cycle_to_time(1000000000);
+    receiver.cycle_to_time(timestamp,1000000000);
 
     flush(logfile,"RL",receiver.RL_log);
 }

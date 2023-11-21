@@ -16,6 +16,8 @@ public:
   std::string ip;
   std::map<std::string, log> SL_log;
   std::map<std::string, log> SR_log;
+  void init_log(std::vector<entry> &entries);
+  void cycle_to_time(long long start,int hz);
 };
 
 class TCPSender : public Sender {
@@ -23,9 +25,6 @@ public:
     void connect__(int &client_socket,std::string dst_ip,int port);
     void send__(int &client_socket,std::string id,int len);
     void disconnect__(int &client_socket);
-    void init_log(std::vector<entry> &entries);
-    void cycle_to_time(int hz);
-
 };
 
 class UDPSender : public Sender {
