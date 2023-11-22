@@ -21,7 +21,7 @@ void TCPSender::send__(int &client_socket, std::string id, int len)
     payload.append(len - 36, '1');
 
     set_timestamp(id, SL_log);
-    send(client_socket, id.c_str(), payload.size(), 0);
+    send(client_socket, payload.c_str(), payload.size(), 0);
     set_timestamp(id, SR_log);
 }
 
