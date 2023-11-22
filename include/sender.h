@@ -17,7 +17,7 @@ public:
     std::map<std::string, log> SL_log;
     std::map<std::string, log> SR_log;
     void init_log(std::vector<entry> &entries);
-    void cycle_to_time(long long start, int hz);
+    void cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz);
 };
 
 class TCPSender : public Sender

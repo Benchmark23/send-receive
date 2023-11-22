@@ -39,7 +39,7 @@ void thread_function(std::vector<entry> recv_entries,
 
     receiver.disconnect__(connect_socket, server_socket);
 
-    receiver.cycle_to_time(start_timestamp, 1000000000);
+    receiver.cycle_to_time(start_timestamp, start_cycle, 1000000000);
 
     flush(logfile, "RL", receiver.RL_log);
 }

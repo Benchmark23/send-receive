@@ -15,7 +15,7 @@ void Receiver::init_log(std::vector<entry> &entries)
     }
 }
 
-void Receiver::cycle_to_time(long long start, int hz)
+void Receiver::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz)
 {
     for (std::map<std::string, log>::iterator it = RL_log.begin(); it != RL_log.end();)
     {
@@ -26,8 +26,8 @@ void Receiver::cycle_to_time(long long start, int hz)
         }
         else
         {
-            double second = (double)(cycle / (double)hz);
-            it->second.timestamp = second * 1000000000 + start;
+            double second = (double)(cycle - start_cycle / (double)hz);
+            it->second.timestamp = second * 1000000000 + start_timestamp;
             ++it;
         }
     }
