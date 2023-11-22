@@ -90,11 +90,15 @@ static inline void set_timestamp(std::string id,std::map<std::string, log> &logs
 
 static inline void flush(std::string filename,std::string log_type,std::map<std::string, log> &logs){
     std::ofstream file(filename, std::ios_base::app);
+    std::map<std::string, log>::iterator it=logs.begin();
+    long long start_time = it->second.timestamp;
+
         if (file.is_open()) {
             for(std::map<std::string, log>::iterator it=logs.begin();it!=logs.end();it++){
 
                 file <<log_type<<" "<<it->first<<" "<<it->second.timestamp<<" "
-                <<it->second.ip<<" "<<it->second.port<<" "<<it->second.protocol<<" "<<it->second.len<<"\n";
+                <<it->second.ip<<" "<<it->second.port<<" "<<it->second.protocol<<" "<<it->second.len
+                <<" "<<start_time<<"\n";
             }
             file.close();
         }
