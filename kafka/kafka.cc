@@ -4,11 +4,13 @@
 #include <librdkafka/rdkafkacpp.h>
 
 // Kafka配置
-const std::string kafkaBroker = "localhost:9092";
+const std::string kafkaBroker = "10.1.0.106:9092";
 const std::string kafkaTopic = "your_topic";
 
 int main() {
     // Kafka配置
+    std::string errstr;
+
     RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
     conf->set("metadata.broker.list", kafkaBroker, errstr);
 
@@ -20,7 +22,7 @@ int main() {
     }
 
     // 打开文件
-    std::ifstream file("your_file.txt");
+    std::ifstream file("../results/recv_log");
     if (!file.is_open()) {
         std::cerr << "Failed to open file." << std::endl;
         return -1;
