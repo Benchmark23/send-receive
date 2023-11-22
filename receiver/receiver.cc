@@ -15,12 +15,20 @@ void Receiver::init_log(std::vector<entry> &entries)
     }
 }
 
-void Receiver::cycle_to_time(int hz)
+void Receiver::cycle_to_time(long long start, int hz)
 {
-    for (std::map<std::string, log>::iterator it = RL_log.begin(); it != RL_log.end(); it++)
+    for (std::map<std::string, log>::iterator it = RL_log.begin(); it != RL_log.end();)
     {
         long long cycle = it->second.timestamp;
-        double second = cycle / hz;
-        it->second.timestamp = second * 1000000000;
+        if (cycle == 0)
+        {
+            it = RL_log.erase(it);
+        }
+        else
+        {
+            double second = (double)(cycle / (double)hz);
+            it->second.timestamp = second * 1000000000 + start;
+            ++it;
+        }
     }
 }

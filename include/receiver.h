@@ -15,9 +15,8 @@ class Receiver
 public:
     std::string ip;
     std::map<std::string, log> RL_log;
-
     void init_log(std::vector<entry> &entries);
-    void cycle_to_time(int hz);
+    void cycle_to_time(long long start, int hz);
 };
 
 class TCPReceiver : public Receiver

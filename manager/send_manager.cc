@@ -37,16 +37,9 @@ void thread_function(std::vector<entry> send_entries,
         t_sender.send__(t_client_socket, send_entries[i].id, send_entries[i].size);
     }
 
-    for(auto &log_pair: t_sender.SL_log){
-        log_pair.second.timestamp = log_pair.second.timestamp - start_cycle + start_timestamp;
-    }
-    for(auto &log_pair: t_sender.SR_log){
-        log_pair.second.timestamp = log_pair.second.timestamp - start_cycle + start_timestamp;
-    }
-
     t_sender.disconnect__(t_client_socket);
 
-
+    t_sender.cycle_to_time(start_timestamp, 1000000000);
 
     flush(logfile, "SL", t_sender.SL_log);
     flush(logfile, "SR", t_sender.SR_log);

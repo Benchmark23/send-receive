@@ -37,22 +37,9 @@ void thread_function(std::vector<entry> recv_entries,
         }
     }
 
-    for (auto it = receiver.RL_log.begin(); it != receiver.RL_log.end();)
-    {
-        auto &log_pair = *it;
-
-        if (log_pair.second.timestamp == 0)
-        {
-            it = receiver.RL_log.erase(it);
-        }
-        else
-        {
-            log_pair.second.timestamp = log_pair.second.timestamp - start_cycle + start_timestamp;
-            ++it;
-        }
-    }
-
     receiver.disconnect__(connect_socket, server_socket);
+
+    receiver.cycle_to_time(start_timestamp, 1000000000);
 
     flush(logfile, "RL", receiver.RL_log);
 }

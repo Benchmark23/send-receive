@@ -88,7 +88,8 @@ static inline void set_timestamp(std::string id, std::map<std::string, log> &log
     // auto duration = now.time_since_epoch();
     // long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
     auto iterator = logs.find(id);
-    if(iterator != logs.end()){
+    if (iterator != logs.end())
+    {
         iterator->second.timestamp = rdtsc();
     }
 }
@@ -102,7 +103,8 @@ static inline void flush(std::string filename, std::string log_type, std::map<st
         {
 
             file << log_type << " " << it->first << " " << it->second.timestamp << " "
-                 << it->second.ip << " " << it->second.port << " " << it->second.protocol << " " << it->second.len << "\n";
+                 << it->second.ip << " " << it->second.port << " " << it->second.protocol << " " << it->second.len
+                 << "\n";
         }
         file.close();
     }

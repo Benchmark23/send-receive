@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -16,9 +16,8 @@ public:
     std::string ip;
     std::map<std::string, log> SL_log;
     std::map<std::string, log> SR_log;
-
     void init_log(std::vector<entry> &entries);
-    void cycle_to_time(int hz);
+    void cycle_to_time(long long start, int hz);
 };
 
 class TCPSender : public Sender
