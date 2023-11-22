@@ -24,14 +24,14 @@ void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int 
     for (std::map<std::string, log>::iterator it = SL_log.begin(); it != SL_log.end(); it++)
     {
         long long cycle = it->second.timestamp;
-        double second = (double)(cycle - start_cycle / (double)hz);
+        double second = (double)(cycle - start_cycle) / (double)hz;
         it->second.timestamp = second * 1000000000 + start_timestamp;
     }
 
     for (std::map<std::string, log>::iterator it = SR_log.begin(); it != SR_log.end(); it++)
     {
         long long cycle = it->second.timestamp;
-        double second = (double)(cycle - start_cycle / (double)hz);
+        double second = (double)(cycle - start_cycle) / (double)hz;
         it->second.timestamp = second * 1000000000 + start_timestamp;
     }
 }

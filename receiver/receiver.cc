@@ -26,7 +26,7 @@ void Receiver::cycle_to_time(long long start_timestamp, uint64_t start_cycle, in
         }
         else
         {
-            double second = (double)(cycle - start_cycle / (double)hz);
+            double second = (double)(cycle - start_cycle) / (double)hz;
             it->second.timestamp = second * 1000000000 + start_timestamp;
             ++it;
         }
