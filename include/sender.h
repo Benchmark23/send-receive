@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -8,34 +10,32 @@
 #include <arpa/inet.h>
 #include "utils.h"
 
-#ifndef SENDER_H
-#define SENDER_H
-
-class Sender {
+class Sender
+{
 public:
-  std::string ip;
-  std::map<std::string, log> SL_log;
-  std::map<std::string, log> SR_log;
-  void init_log(std::vector<entry> &entries);
-  void cycle_to_time(long long start,int hz);
+    std::string ip;
+    std::map<std::string, log> SL_log;
+    std::map<std::string, log> SR_log;
+    void init_log(std::vector<entry> &entries);
+    void cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz);
 };
 
-class TCPSender : public Sender {
+class TCPSender : public Sender
+{
 public:
-    void connect__(int &client_socket,std::string dst_ip,int port);
-    void send__(int &client_socket,std::string id,int len);
+    void connect__(int &client_socket, std::string dst_ip, int port);
+    void send__(int &client_socket, std::string id, int len);
     void disconnect__(int &client_socket);
 };
 
-class UDPSender : public Sender {
+class UDPSender : public Sender
+{
 public:
-    void send__(std::string dst_ip,int port,std::string message);
+    void send__(std::string dst_ip, int port, std::string message);
 };
 
-class RDMASender : public Sender {
+class RDMASender : public Sender
+{
 public:
-    void send__(std::string dst_ip,int port,std::string message);
+    void send__(std::string dst_ip, int port, std::string message);
 };
-
-
-#endif

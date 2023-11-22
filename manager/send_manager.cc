@@ -8,39 +8,43 @@
 #include "sender.h"
 
 void thread_function(std::vector<entry> send_entries,
-    std::vector<long long> intvals, std::string self_ip , 
-    std::string target_ip,int target_port , std::string logfile) {
-
+                     std::vector<long long> intvals, std::string self_ip,
+                     std::string target_ip, int target_port, std::string logfile)
+{
     cpu_set_t mask;
     CPU_ZERO(&mask);
     CPU_SET(0, &mask);
     sched_setaffinity(0, sizeof(mask), &mask);
 
     TCPSender t_sender;
-    t_sender.ip=self_ip;
+    t_sender.ip = self_ip;
     t_sender.init_log(send_entries);
 
-    int t_client_socket=0;
+    int t_client_socket = 0;
     UDPSender u_sender;
 
     t_sender.connect__(t_client_socket, target_ip, target_port);
-    
-    auto now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
-    for(int i=0;i<send_entries.size();i++){
+    auto start_cycle = rdtsc();
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto duration = start_time.time_since_epoch();
+    long long start_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+
+    for (int i = 0; i < send_entries.size(); i++)
+    {
 
         std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        t_sender.send__(t_client_socket,send_entries[i].id,send_entries[i].size);
+        t_sender.send__(t_client_socket, send_entries[i].id, send_entries[i].size);
     }
 
     t_sender.disconnect__(t_client_socket);
 
-    t_sender.cycle_to_time(timestamp,1000000000);
-    flush(logfile,"SL", t_sender.SL_log);
-    flush(logfile,"SR", t_sender.SR_log);
+    t_sender.cycle_to_time(start_timestamp, start_cycle, 1000000000);
+
+    flush(logfile, "SL", t_sender.SL_log);
+    flush(logfile, "SR", t_sender.SR_log);
 }
+
 int main(int argc, char *argv[])
 {
 
@@ -62,20 +66,22 @@ int main(int argc, char *argv[])
     std::vector<long long> intvals;
     parse(taskfile, send_entries);
 
-    for(int i = 0; i < send_entries.size(); i++){
+    for (int i = 0; i < send_entries.size(); i++)
+    {
         long long nanoseconds;
-        if(i==0){
-            nanoseconds=0;
+        if (i == 0)
+        {
+            nanoseconds = (long long)send_entries[i].timestamp;
         }
-        else{
-            nanoseconds=(long long)(send_entries[i].timestamp-send_entries[i-1].timestamp);
+        else
+        {
+            nanoseconds = (long long)(send_entries[i].timestamp - send_entries[i - 1].timestamp);
         }
         intvals.push_back(nanoseconds);
     }
 
-    std::thread t(thread_function,send_entries,intvals,self_ip,target_ip,target_port,logfile);
+    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile);
     t.join();
-   
 
     return 0;
 }

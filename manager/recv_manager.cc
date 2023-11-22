@@ -5,46 +5,51 @@
 #include "utils.h"
 #include "receiver.h"
 #include "sender.h"
-void thread_function(std::vector<entry> recv_entries,
-    std::string self_ip , int self_port , std::string logfile, int total_time) {
 
+void thread_function(std::vector<entry> recv_entries,
+                     std::string self_ip, int self_port, std::string logfile, int total_time)
+{
     cpu_set_t mask;
     CPU_ZERO(&mask);
     CPU_SET(1, &mask);
     sched_setaffinity(0, sizeof(mask), &mask);
 
     TCPReceiver receiver;
-    receiver.ip=self_ip;
+    receiver.ip = self_ip;
     receiver.init_log(recv_entries);
 
-    int connect_socket,server_socket;
-    
-    receiver.accept__(connect_socket,server_socket,self_port);
+    int connect_socket, server_socket;
+    receiver.accept__(connect_socket, server_socket, self_port);
 
-    auto now = std::chrono::high_resolution_clock::now();
-    auto duration = now.time_since_epoch();
-    long long timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    auto start_cycle = rdtsc();
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto duration = start_time.time_since_epoch();
+    long long start_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
-    auto start_time = std::chrono::steady_clock::now();
-    while(1){
+    auto begin_time = std::chrono::steady_clock::now();
+    while (1)
+    {
 
         receiver.receive__(connect_socket);
-        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start_time).count() > total_time) {  // 5 秒后停止
+        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin_time).count() > total_time)
+        {
             break;
         }
     }
 
-    receiver.disconnect__(connect_socket,server_socket);
-    receiver.cycle_to_time(timestamp,1000000000);
+    receiver.disconnect__(connect_socket, server_socket);
 
-    flush(logfile,"RL",receiver.RL_log);
+    receiver.cycle_to_time(start_timestamp, start_cycle, 1000000000);
+
+    flush(logfile, "RL", receiver.RL_log);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
-    if (argc != 5)
+    if (argc != 6)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <self_port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <self_port> <total_time>" << std::endl;
         return 1;
     }
 
@@ -53,11 +58,12 @@ int main(int argc, char *argv[]) {
 
     std::string self_ip = argv[3];
     int self_port = std::atoi(argv[4]);
+    int total_time = std::atoi(argv[5]);
 
     std::vector<entry> recv_entries;
     parse(taskfile, recv_entries);
 
-    std::thread t(thread_function,recv_entries,self_ip,self_port,logfile,5);
+    std::thread t(thread_function, recv_entries, self_ip, self_port, logfile, total_time + 3);
     t.join();
 
     return 0;
