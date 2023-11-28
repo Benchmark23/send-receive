@@ -24,7 +24,7 @@ void thread_function(std::vector<entry> send_entries,
 
     if (t_sender.connect__(target_ip, target_port) != 0)
     {
-        std::cerr << "Error connecting to receiver. ip: " << target_ip << " port: " << target_port << std::endl;
+        return;
     }
 
     auto start_cycle = rdtsc();

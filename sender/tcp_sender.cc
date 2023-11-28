@@ -11,6 +11,7 @@ int TCPSender::connect__(std::string dst_ip, int port)
 
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
+        std::cerr << "Error connecting to receiver. ip: " << dst_ip << " port: " << port << std::endl;
         return -1;
     }
     return 0;
