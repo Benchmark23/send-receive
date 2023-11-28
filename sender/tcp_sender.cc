@@ -9,6 +9,15 @@ int TCPSender::connect__(std::string dst_ip, int port)
     server_addr.sin_addr.s_addr = inet_addr(dst_ip.c_str());
     server_addr.sin_port = htons(port);
 
+    // disable nagle's algorithm
+    int flag = 1;
+    int result = setsockopt(client_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
+    if (result == -1)
+    {
+        std::cerr << "Failed to set TCP_NODELAY option." << std::endl;
+        return 1;
+    }
+
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
         std::cerr << "Error connecting to receiver. ip: " << dst_ip << " port: " << port << std::endl;
