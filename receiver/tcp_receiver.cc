@@ -1,6 +1,6 @@
 #include "receiver.h"
 
-void TCPReceiver::accept__(int &connect_socket, int &server_socket, int port)
+int TCPReceiver::accept__(int port)
 {
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -12,36 +12,39 @@ void TCPReceiver::accept__(int &connect_socket, int &server_socket, int port)
     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
         std::cerr << "Error binding socket to address" << std::endl;
-        return;
+        return -1;
     }
     if (listen(server_socket, 5) == -1)
     {
         std::cerr << "Error listening for connections" << std::endl;
-        return;
+        return -1;
     }
     std::cout << "receiver is listening on port " << port << "..." << std::endl;
-    connect_socket = accept(server_socket, NULL, NULL);
+    connect_socket = accept(server_socket, nullptr, nullptr);
     if (connect_socket == -1)
     {
         std::cerr << "Error accepting client connection" << std::endl;
-    }
-}
-
-int TCPReceiver::receive__(int &connect_socket)
-{
-    char buffer[2048] = {0};
-    size_t bytes = recv(connect_socket, buffer, sizeof(buffer), 0);
-
-    if (bytes != 0)
-    {
-        std::string extractedString(buffer, 36);
-        set_timestamp(extractedString, RL_log);
-        return 1;
+        return -1;
     }
     return 0;
 }
 
-void TCPReceiver::disconnect__(int &connect_socket, int &server_socket)
+int TCPReceiver::receive__()
+{
+    char buffer[2048] = {0};
+    auto bytes = recv(connect_socket, buffer, sizeof(buffer), 0);
+
+    if (bytes <= 0)
+    {
+        return -1;
+    }
+
+    std::string extractedString(buffer, 36);
+    set_timestamp(extractedString, RL_log);
+    return 0;
+}
+
+void TCPReceiver::disconnect__()
 {
     close(server_socket);
     close(connect_socket);

@@ -17,24 +17,40 @@ public:
     std::map<std::string, log> RL_log;
     void init_log(std::vector<entry> &entries);
     void cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz);
+
+    virtual int accept__(int port) = 0;
+    virtual int receive__() = 0;
+    virtual void disconnect__() = 0;
 };
 
 class TCPReceiver : public Receiver
 {
 public:
-    void accept__(int &connect_socket, int &server_socket, int port);
-    int receive__(int &connect_socket);
-    void disconnect__(int &connect_socket, int &server_socket);
+    int accept__(int port);
+    int receive__();
+    void disconnect__();
+
+private:
+    int connect_socket;
+    int server_socket;
 };
 
 class UDPReceiver : public Receiver
 {
 public:
-    void receive__(int port);
+    int accept__(int port);
+    int receive__();
+    void disconnect__();
+
+private:
+    int server_socket;
+    struct sockaddr_in server_addr;
 };
 
 class RDMAReceiver : public Receiver
 {
 public:
-    void receive__(int port);
+    int accept__(int port);
+    int receive__();
+    void disconnect__();
 };
