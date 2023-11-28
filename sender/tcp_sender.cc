@@ -1,6 +1,6 @@
 #include "sender.h"
 
-void TCPSender::connect__(int &client_socket, std::string dst_ip, int port)
+int TCPSender::connect__(std::string dst_ip, int port)
 {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -11,11 +11,12 @@ void TCPSender::connect__(int &client_socket, std::string dst_ip, int port)
 
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
-        std::cerr << "Error connecting to receiver:" << port << std::endl;
+        return -1;
     }
+    return 0;
 }
 
-void TCPSender::send__(int &client_socket, std::string id, int len)
+void TCPSender::send__(std::string id, int len)
 {
     std::string payload = id;
     payload.append(len - 36, '1');
@@ -25,7 +26,7 @@ void TCPSender::send__(int &client_socket, std::string id, int len)
     set_timestamp(id, SR_log);
 }
 
-void TCPSender::disconnect__(int &client_socket)
+void TCPSender::disconnect__()
 {
     close(client_socket);
 }
