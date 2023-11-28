@@ -15,8 +15,8 @@ class Sender
 {
 public:
     std::string ip;
-    std::map<std::string, log> SL_log;
-    std::map<std::string, log> SR_log;
+    std::map<std::string, Log> SL_log;
+    std::map<std::string, Log> SR_log;
     void init_log(std::vector<entry> &entries);
     void cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz);
 

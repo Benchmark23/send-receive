@@ -27,7 +27,7 @@ struct entry
     int size;
 };
 
-struct log
+struct Log
 {
     // std::string id;
     // int cpu;
@@ -81,7 +81,7 @@ static inline void parse(const std::string &filename, std::vector<entry> &entrie
         entries.push_back(e);
     }
 }
-static inline void set_timestamp(std::string id, std::map<std::string, log> &logs)
+static inline void set_timestamp(std::string id, std::map<std::string, Log> &logs)
 {
 
     // auto now = std::chrono::high_resolution_clock::now();
@@ -94,12 +94,12 @@ static inline void set_timestamp(std::string id, std::map<std::string, log> &log
     }
 }
 
-static inline void flush(std::string filename, std::string log_type, std::map<std::string, log> &logs)
+static inline void flush(std::string filename, std::string log_type, std::map<std::string, Log> &logs)
 {
     std::ofstream file(filename, std::ios_base::app);
     if (file.is_open())
     {
-        for (std::map<std::string, log>::iterator it = logs.begin(); it != logs.end(); it++)
+        for (std::map<std::string, Log>::iterator it = logs.begin(); it != logs.end(); it++)
         {
 
             file << log_type << " " << it->first << " " << it->second.timestamp << " "
