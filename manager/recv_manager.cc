@@ -18,8 +18,10 @@ void thread_function(std::vector<entry> recv_entries,
     receiver.ip = self_ip;
     receiver.init_log(recv_entries);
 
-    int connect_socket, server_socket;
-    receiver.accept__(connect_socket, server_socket, self_port);
+    if (receiver.accept__(self_port) != 0)
+    {
+        return;
+    }
 
     auto start_cycle = rdtsc();
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -29,15 +31,18 @@ void thread_function(std::vector<entry> recv_entries,
     auto begin_time = std::chrono::steady_clock::now();
     while (1)
     {
-
-        receiver.receive__(connect_socket);
+        if (receiver.receive__() != 0)
+        {
+            break;
+        }
+        // TODO: use a better method to control when to stop the receiver
         if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin_time).count() > total_time)
         {
             break;
         }
     }
 
-    receiver.disconnect__(connect_socket, server_socket);
+    receiver.disconnect__();
 
     receiver.cycle_to_time(start_timestamp, start_cycle, 1000000000);
 

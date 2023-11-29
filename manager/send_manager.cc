@@ -20,10 +20,12 @@ void thread_function(std::vector<entry> send_entries,
     t_sender.ip = self_ip;
     t_sender.init_log(send_entries);
 
-    int t_client_socket = 0;
     UDPSender u_sender;
 
-    t_sender.connect__(t_client_socket, target_ip, target_port);
+    if (t_sender.connect__(target_ip, target_port) != 0)
+    {
+        return;
+    }
 
     auto start_cycle = rdtsc();
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -32,12 +34,15 @@ void thread_function(std::vector<entry> send_entries,
 
     for (int i = 0; i < send_entries.size(); i++)
     {
-
         std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        t_sender.send__(t_client_socket, send_entries[i].id, send_entries[i].size);
+        if(t_sender.send__(send_entries[i].id, send_entries[i].size) < 0)
+        {
+            std::cerr << "send error" << std::endl;
+            break;
+        }
     }
 
-    t_sender.disconnect__(t_client_socket);
+    t_sender.disconnect__();
 
     t_sender.cycle_to_time(start_timestamp, start_cycle, 1000000000);
 

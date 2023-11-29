@@ -1,6 +1,6 @@
 #include "sender.h"
 
-void TCPSender::connect__(int &client_socket, std::string dst_ip, int port)
+int TCPSender::connect__(std::string dst_ip, int port)
 {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -11,21 +11,34 @@ void TCPSender::connect__(int &client_socket, std::string dst_ip, int port)
 
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
-        std::cerr << "Error connecting to receiver:" << port << std::endl;
+        std::cerr << "Error connecting to receiver. ip: " << dst_ip << " port: " << port << std::endl;
+        return -1;
     }
+    return 0;
 }
 
-void TCPSender::send__(int &client_socket, std::string id, int len)
+int TCPSender::send__(std::string id, int len)
 {
-    std::string payload = id;
-    payload.append(len - 36, '1');
+    constexpr int id_size = 36;
+    int32_t payload_size;
+    int min_message_size = sizeof(payload_size) + id_size;
+    len = std::max(len, min_message_size);
+    payload_size = len - sizeof(payload_size);
+
+    std::string message;
+    message.reserve(len);
+
+    message.append(reinterpret_cast<char *>(&payload_size), sizeof(payload_size))
+        .append(id)
+        .append(len - min_message_size, '1');
 
     set_timestamp(id, SL_log);
-    send(client_socket, payload.c_str(), payload.size(), 0);
+    int bytes_sent = send(client_socket, message.data(), len, 0);
     set_timestamp(id, SR_log);
+    return bytes_sent;
 }
 
-void TCPSender::disconnect__(int &client_socket)
+void TCPSender::disconnect__()
 {
     close(client_socket);
 }

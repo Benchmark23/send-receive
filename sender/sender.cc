@@ -4,7 +4,7 @@ void Sender::init_log(std::vector<entry> &entries)
 {
     for (int i = 0; i < entries.size(); i++)
     {
-        log sl_log_entry;
+        Log sl_log_entry;
         sl_log_entry.timestamp = 0;
         sl_log_entry.ip = this->ip;
         sl_log_entry.port = entries[i].src_port;
@@ -21,17 +21,33 @@ void Sender::init_log(std::vector<entry> &entries)
 
 void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz)
 {
-    for (std::map<std::string, log>::iterator it = SL_log.begin(); it != SL_log.end(); it++)
+    for (std::map<std::string, Log>::iterator it = SL_log.begin(); it != SL_log.end();)
     {
         long long cycle = it->second.timestamp;
-        double second = (double)(cycle - start_cycle) / (double)hz;
-        it->second.timestamp = second * 1000000000 + start_timestamp;
+        if (cycle == 0)
+        {
+            it = SL_log.erase(it);
+        }
+        else
+        {
+            double second = (double)(cycle - start_cycle) / (double)hz;
+            it->second.timestamp = second * 1000000000 + start_timestamp;
+            it++;
+        }
     }
 
-    for (std::map<std::string, log>::iterator it = SR_log.begin(); it != SR_log.end(); it++)
+    for (std::map<std::string, Log>::iterator it = SR_log.begin(); it != SR_log.end();)
     {
         long long cycle = it->second.timestamp;
-        double second = (double)(cycle - start_cycle) / (double)hz;
-        it->second.timestamp = second * 1000000000 + start_timestamp;
+        if (cycle == 0)
+        {
+            it = SR_log.erase(it);
+        }
+        else
+        {
+            double second = (double)(cycle - start_cycle) / (double)hz;
+            it->second.timestamp = second * 1000000000 + start_timestamp;
+            it++;
+        }
     }
 }

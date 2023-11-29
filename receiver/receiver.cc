@@ -4,7 +4,7 @@ void Receiver::init_log(std::vector<entry> &entries)
 {
     for (int i = 0; i < entries.size(); i++)
     {
-        log rl_log_entry;
+        Log rl_log_entry;
         rl_log_entry.timestamp = 0;
         rl_log_entry.ip = this->ip;
         rl_log_entry.port = entries[i].dst_port;
@@ -17,7 +17,7 @@ void Receiver::init_log(std::vector<entry> &entries)
 
 void Receiver::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz)
 {
-    for (std::map<std::string, log>::iterator it = RL_log.begin(); it != RL_log.end();)
+    for (std::map<std::string, Log>::iterator it = RL_log.begin(); it != RL_log.end();)
     {
         long long cycle = it->second.timestamp;
         if (cycle == 0)
