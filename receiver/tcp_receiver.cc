@@ -38,16 +38,17 @@ int TCPReceiver::receive__()
     {
         if (bytes_received == 0)
         {
-            std::cerr << "Connection closed by peer.\n";
+            return 0;
         }
         else
         {
-            std::cerr << "Error during recv.\n";
+            std::cerr << "<payload_size> Error during recv.\n";
+            return -1;
         }
-        return -1;
     }
 
-    std::vector<char> buffer(payload_size);
+    std::vector<char> buffer;
+    buffer.reserve(payload_size);
     int total_bytes_received = 0;
 
     while (total_bytes_received < payload_size)
@@ -58,15 +59,14 @@ int TCPReceiver::receive__()
         {
             if (bytes_received == 0)
             {
-                std::cerr << "Connection closed by peer.\n";
+                std::cerr << "<buffer> Connection closed by peer.\n";
             }
             else
             {
-                std::cerr << "Error during recv.\n";
+                std::cerr << "<buffer> Error during recv.\n";
             }
             return -1;
         }
-
         total_bytes_received += bytes_received;
     }
 

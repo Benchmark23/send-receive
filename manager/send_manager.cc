@@ -35,7 +35,11 @@ void thread_function(std::vector<entry> send_entries,
     for (int i = 0; i < send_entries.size(); i++)
     {
         std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        t_sender.send__(send_entries[i].id, send_entries[i].size);
+        if(t_sender.send__(send_entries[i].id, send_entries[i].size) < 0)
+        {
+            std::cerr << "send error" << std::endl;
+            break;
+        }
     }
 
     t_sender.disconnect__();

@@ -10,15 +10,16 @@ int UDPSender::connect__(std::string dst_ip, int port)
 	return 0;
 }
 
-void UDPSender::send__(std::string id, int len)
+int UDPSender::send__(std::string id, int len)
 {
 	std::string payload = id;
 	payload.append(len - 36, '1');
 
 	set_timestamp(id, SL_log);
-	sendto(client_socket, payload.c_str(), payload.size(), 0,
-		   (struct sockaddr *)&server_addr, sizeof(server_addr));
+	int bytes_sent = sendto(client_socket, payload.c_str(), payload.size(), 0,
+							(struct sockaddr *)&server_addr, sizeof(server_addr));
 	set_timestamp(id, SR_log);
+	return bytes_sent;
 }
 
 void UDPSender::disconnect__()

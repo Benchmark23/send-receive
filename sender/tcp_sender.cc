@@ -26,12 +26,13 @@ int TCPSender::connect__(std::string dst_ip, int port)
     return 0;
 }
 
-void TCPSender::send__(std::string id, int len)
+int TCPSender::send__(std::string id, int len)
 {
     constexpr int id_size = 36;
-    int32_t payload_size = std::max(len, id_size);
+    int32_t payload_size;
     int min_message_size = sizeof(payload_size) + id_size;
     len = std::max(len, min_message_size);
+    payload_size = len - sizeof(payload_size);
 
     std::string message;
     message.reserve(len);
@@ -41,8 +42,9 @@ void TCPSender::send__(std::string id, int len)
         .append(len - min_message_size, '1');
 
     set_timestamp(id, SL_log);
-    send(client_socket, message.data(), len, 0);
+    int bytes_sent = send(client_socket, message.data(), len, 0);
     set_timestamp(id, SR_log);
+    return bytes_sent;
 }
 
 void TCPSender::disconnect__()

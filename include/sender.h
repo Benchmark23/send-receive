@@ -22,7 +22,7 @@ public:
 
     // TODO: require a unified structure rather than specifying the ip and port
     virtual int connect__(std::string dst_ip, int port) = 0;
-    virtual void send__(std::string id, int len) = 0;
+    virtual int send__(std::string id, int len) = 0;
     virtual void disconnect__() = 0;
 };
 
@@ -30,7 +30,7 @@ class TCPSender : public Sender
 {
 public:
     int connect__(std::string dst_ip, int port);
-    void send__(std::string id, int len);
+    int send__(std::string id, int len);
     void disconnect__();
 
 private:
@@ -41,7 +41,7 @@ class UDPSender : public Sender
 {
 public:
     int connect__(std::string dst_ip, int port);
-    void send__(std::string id, int len);
+    int send__(std::string id, int len);
     void disconnect__();
 
 private:
@@ -53,6 +53,6 @@ class RDMASender : public Sender
 {
 public:
     int connect__(std::string dst_ip, int port);
-    void send__(std::string id, int len);
+    int send__(std::string id, int len);
     void disconnect__();
 };
