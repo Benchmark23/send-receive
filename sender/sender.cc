@@ -19,7 +19,7 @@ void Sender::init_log(std::vector<entry> &entries)
     }
 }
 
-void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz)
+void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, double ghz)
 {
     for (std::map<std::string, Log>::iterator it = SL_log.begin(); it != SL_log.end();)
     {
@@ -30,8 +30,8 @@ void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int 
         }
         else
         {
-            double second = (double)(cycle - start_cycle) / (double)hz;
-            it->second.timestamp = second * 1000000000 + start_timestamp;
+            double second = (double)(cycle - start_cycle) / ghz;
+            it->second.timestamp = second + start_timestamp;
             it++;
         }
     }
@@ -45,8 +45,8 @@ void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, int 
         }
         else
         {
-            double second = (double)(cycle - start_cycle) / (double)hz;
-            it->second.timestamp = second * 1000000000 + start_timestamp;
+            double second = (double)(cycle - start_cycle) / ghz;
+            it->second.timestamp = second  + start_timestamp;
             it++;
         }
     }

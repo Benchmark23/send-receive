@@ -9,7 +9,7 @@
 
 void thread_function(std::vector<entry> send_entries,
                      std::vector<long long> intvals, std::string self_ip,
-                     std::string target_ip, int target_port, std::string logfile)
+                     std::string target_ip, int target_port, std::string logfile, double ghz)
 {
     cpu_set_t mask;
     CPU_ZERO(&mask);
@@ -32,19 +32,24 @@ void thread_function(std::vector<entry> send_entries,
     auto duration = start_time.time_since_epoch();
     long long start_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
-    for (int i = 0; i < send_entries.size(); i++)
-    {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(intvals[i]));
-        if(t_sender.send__(send_entries[i].id, send_entries[i].size) < 0)
-        {
-            std::cerr << "send error" << std::endl;
-            break;
+    // 
+    int i = 0;
+    int upper = send_entries.size();
+    while(i < upper){
+        long long now_cycle = rdtsc();
+        long long now_time = (double)(now_cycle - start_cycle) / ghz;
+        if(now_time >= send_entries[i].timestamp){
+            if(t_sender.send__(send_entries[i].id, send_entries[i].size) < 0){
+               std::cerr << "send error" << std::endl;
+               break;
+            }
+            i++;
         }
     }
 
     t_sender.disconnect__();
 
-    t_sender.cycle_to_time(start_timestamp, start_cycle, 1000000000);
+    t_sender.cycle_to_time(start_timestamp, start_cycle, ghz);
 
     flush(logfile, "SL", t_sender.SL_log);
     flush(logfile, "SR", t_sender.SR_log);
@@ -53,9 +58,9 @@ void thread_function(std::vector<entry> send_entries,
 int main(int argc, char *argv[])
 {
 
-    if (argc != 7)
+    if (argc != 8)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port> <ghz>" << std::endl;
         return 1;
     }
 
@@ -66,6 +71,8 @@ int main(int argc, char *argv[])
     std::string target_ip = argv[4];
     int self_port = std::atoi(argv[5]);
     int target_port = std::atoi(argv[6]);
+
+    double ghz = std::stod(argv[7]);
 
     std::vector<entry> send_entries;
     std::vector<long long> intvals;
@@ -85,7 +92,7 @@ int main(int argc, char *argv[])
         intvals.push_back(nanoseconds);
     }
 
-    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile);
+    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile, ghz);
     t.join();
 
     return 0;

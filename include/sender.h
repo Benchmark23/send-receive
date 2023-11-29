@@ -18,7 +18,7 @@ public:
     std::map<std::string, Log> SL_log;
     std::map<std::string, Log> SR_log;
     void init_log(std::vector<entry> &entries);
-    void cycle_to_time(long long start_timestamp, uint64_t start_cycle, int hz);
+    void cycle_to_time(long long start_timestamp, uint64_t start_cycle, double ghz);
 
     // TODO: require a unified structure rather than specifying the ip and port
     virtual int connect__(std::string dst_ip, int port) = 0;
