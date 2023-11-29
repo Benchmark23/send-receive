@@ -31,7 +31,11 @@ void thread_function(std::vector<entry> recv_entries,
     auto begin_time = std::chrono::steady_clock::now();
     while (1)
     {
-        receiver.receive__();
+        if (receiver.receive__() != 0)
+        {
+            break;
+        }
+        // TODO: use a better method to control when to stop the receiver
         if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin_time).count() > total_time)
         {
             break;

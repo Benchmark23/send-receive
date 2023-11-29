@@ -31,15 +31,46 @@ int TCPReceiver::accept__(int port)
 
 int TCPReceiver::receive__()
 {
-    char buffer[2048] = {0};
-    auto bytes = recv(connect_socket, buffer, sizeof(buffer), 0);
+    int32_t payload_size;
+    int bytes_received = recv(connect_socket, reinterpret_cast<char *>(&payload_size), sizeof(payload_size), 0);
 
-    if (bytes <= 0)
+    if (bytes_received <= 0)
     {
+        if (bytes_received == 0)
+        {
+            std::cerr << "Connection closed by peer.\n";
+        }
+        else
+        {
+            std::cerr << "Error during recv.\n";
+        }
         return -1;
     }
 
-    std::string extractedString(buffer, 36);
+    std::vector<char> buffer(payload_size);
+    int total_bytes_received = 0;
+
+    while (total_bytes_received < payload_size)
+    {
+        bytes_received = recv(connect_socket, buffer.data() + total_bytes_received, payload_size - total_bytes_received, 0);
+
+        if (bytes_received <= 0)
+        {
+            if (bytes_received == 0)
+            {
+                std::cerr << "Connection closed by peer.\n";
+            }
+            else
+            {
+                std::cerr << "Error during recv.\n";
+            }
+            return -1;
+        }
+
+        total_bytes_received += bytes_received;
+    }
+
+    std::string extractedString(buffer.data(), 36);
     set_timestamp(extractedString, RL_log);
     return 0;
 }
