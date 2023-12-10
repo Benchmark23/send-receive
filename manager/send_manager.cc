@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "receiver.h"
 #include "sender.h"
+#include "tscns.h"
 
 void thread_function(std::vector<entry> send_entries,
                      std::vector<long long> intvals, std::string self_ip,
@@ -27,29 +28,50 @@ void thread_function(std::vector<entry> send_entries,
         return;
     }
 
-    auto start_cycle = rdtsc();
-    auto start_time = std::chrono::high_resolution_clock::now();
-    auto duration = start_time.time_since_epoch();
-    long long start_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    std::vector<std::string> sent_buffer;
 
-    // 
+    TSCNS tscns;
+    tscns.init();
+
     int i = 0;
     int upper = send_entries.size();
-    while(i < upper){
-        long long now_cycle = rdtsc();
-        long long now_time = (double)(now_cycle - start_cycle) / ghz;
-        if(now_time >= send_entries[i].timestamp){
-            if(t_sender.send__(send_entries[i].id, send_entries[i].size) < 0){
-               std::cerr << "send error" << std::endl;
-               break;
+    while (i < upper)
+    {
+        auto now_cycle = tscns.rdtsc();
+        if (tscns.tsc2ns(now_cycle) >= send_entries[i].timestamp)
+        {
+            auto send_res = t_sender.send__(send_entries[i].id, send_entries[i].size);
+            if (send_res < 0)
+            {
+                std::cerr << "send error" << std::endl;
+                break;
             }
+            sent_buffer.push_back(send_entries[i].id);
             i++;
+        }
+        // assuming 500 cycle is enough for time conversion
+        else if (tscns.tsc2ns(now_cycle + 500) < send_entries[i].timestamp && !sent_buffer.empty())
+        {
+            auto id = sent_buffer.back();
+            t_sender.update_SL_time(id, tscns.tsc2ns(t_sender.SL_log[id].timestamp));
+            t_sender.update_SR_time(id, tscns.tsc2ns(t_sender.SR_log[id].timestamp));
+            sent_buffer.pop_back();
+        }
+        else if (sent_buffer.empty() && tscns.tsc2ns(now_cycle + 10000000) < send_entries[i].timestamp && !sent_buffer.empty())
+        {
+            tscns.calibrate();
         }
     }
 
     t_sender.disconnect__();
 
-    t_sender.cycle_to_time(start_timestamp, start_cycle, ghz);
+    while (!sent_buffer.empty())
+    {
+        auto id = sent_buffer.back();
+        t_sender.update_SL_time(id, tscns.tsc2ns(t_sender.SL_log[id].timestamp));
+        t_sender.update_SR_time(id, tscns.tsc2ns(t_sender.SR_log[id].timestamp));
+        sent_buffer.pop_back();
+    }
 
     flush(logfile, "SL", t_sender.SL_log);
     flush(logfile, "SR", t_sender.SR_log);

@@ -51,3 +51,13 @@ void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, doub
         }
     }
 }
+
+void Sender::update_SL_time(std::string &id, long long timestamp)
+{
+    set_time(id, SL_log, timestamp);
+}
+
+void Sender::update_SR_time(std::string &id, long long timestamp)
+{
+    set_time(id, SR_log, timestamp);
+}

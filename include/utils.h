@@ -78,7 +78,23 @@ static inline void set_timestamp(std::string id, std::map<std::string, Log> &log
     {
         std::cerr << "invalid id: " << id << std::endl;
     }
-    iterator->second.timestamp = rdtsc();
+    else
+    {
+        iterator->second.timestamp = rdtsc();
+    }
+}
+
+static inline void set_time(std::string &id, std::map<std::string, Log> &logs, long long timestamp)
+{
+    auto iterator = logs.find(id);
+    if (iterator == logs.end())
+    {
+        std::cerr << "invalid id: " << id << std::endl;
+    }
+    else
+    {
+        iterator->second.timestamp = timestamp;
+    }
 }
 
 static inline void flush(std::string filename, std::string log_type, std::map<std::string, Log> &logs)
