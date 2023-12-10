@@ -26,8 +26,8 @@ void Receiver::cycle_to_time(long long start_timestamp, uint64_t start_cycle, do
         }
         else
         {
-            double second = (double)(cycle - start_cycle) / ghz;
-            it->second.timestamp = second + start_timestamp;
+            double nanoseconds = (double)(cycle - start_cycle) / ghz;
+            it->second.timestamp = nanoseconds + start_timestamp;
             ++it;
         }
     }
