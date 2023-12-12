@@ -32,9 +32,9 @@ int TCPSender::send__(std::string id, int len)
         .append(id)
         .append(len - min_message_size, '1');
 
-    set_timestamp(id, SL_log);
+    set_timens(id, SL_log);
     int bytes_sent = send(client_socket, message.data(), len, 0);
-    set_timestamp(id, SR_log);
+    set_timens(id, SR_log);
     return bytes_sent;
 }
 

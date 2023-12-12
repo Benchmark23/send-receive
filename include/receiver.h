@@ -9,14 +9,17 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "utils.h"
+#include "tscns.h"
 
 class Receiver
 {
 public:
+    TSCNS *tscns;
     std::string ip;
     std::map<std::string, Log> RL_log;
     void init_log(std::vector<entry> &entries);
     void cycle_to_time(long long start_timestamp, uint64_t start_cycle, double ghz);
+    void set_timens(std::string id, std::map<std::string, Log> &logs);
 
     virtual int accept__(int port) = 0;
     virtual int receive__() = 0;

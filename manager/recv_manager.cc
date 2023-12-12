@@ -23,10 +23,9 @@ void thread_function(std::vector<entry> recv_entries,
         return;
     }
 
-    auto start_cycle = rdtsc();
-    auto start_time = std::chrono::high_resolution_clock::now();
-    auto duration = start_time.time_since_epoch();
-    long long start_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    TSCNS tscns;
+    tscns.init();
+    receiver.tscns = &tscns;
 
     auto begin_time = std::chrono::steady_clock::now();
     while (1)
@@ -44,17 +43,15 @@ void thread_function(std::vector<entry> recv_entries,
 
     receiver.disconnect__();
 
-    receiver.cycle_to_time(start_timestamp, start_cycle, ghz);
-
     flush(logfile, "RL", receiver.RL_log);
 }
 
 int main(int argc, char *argv[])
 {
 
-    if (argc != 7)
+    if (argc != 6)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <self_port> <total_time> <ghz>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <self_port> <total_time>" << std::endl;
         return 1;
     }
 
@@ -65,8 +62,9 @@ int main(int argc, char *argv[])
     int self_port = std::atoi(argv[4]);
     int total_time = std::atoi(argv[5]);
 
-    double ghz = std::stod(argv[6]);
-    
+    // double ghz = std::stod(argv[6]);
+    double ghz = 1.0;
+
     std::vector<entry> recv_entries;
     parse(taskfile, recv_entries);
 

@@ -52,12 +52,15 @@ void Sender::cycle_to_time(long long start_timestamp, uint64_t start_cycle, doub
     }
 }
 
-void Sender::update_SL_time(std::string &id, long long timestamp)
+void Sender::set_timens(std::string id, std::map<std::string, Log> &logs)
 {
-    set_time(id, SL_log, timestamp);
-}
-
-void Sender::update_SR_time(std::string &id, long long timestamp)
-{
-    set_time(id, SR_log, timestamp);
+    auto iterator = logs.find(id);
+    if (iterator == logs.end())
+    {
+        std::cerr << "invalid id: " << id << std::endl;
+    }
+    else
+    {
+        iterator->second.timestamp = tscns->rdns();
+    }
 }

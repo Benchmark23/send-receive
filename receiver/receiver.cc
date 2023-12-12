@@ -32,3 +32,16 @@ void Receiver::cycle_to_time(long long start_timestamp, uint64_t start_cycle, do
         }
     }
 }
+
+void Receiver::set_timens(std::string id, std::map<std::string, Log> &logs)
+{
+    auto iterator = logs.find(id);
+    if (iterator == logs.end())
+    {
+        std::cerr << "invalid id: " << id << std::endl;
+    }
+    else
+    {
+        iterator->second.timestamp = tscns->rdns();
+    }
+}

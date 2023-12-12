@@ -71,7 +71,7 @@ int TCPReceiver::receive__()
     }
 
     std::string extractedString(buffer.data(), 36);
-    set_timestamp(extractedString, RL_log);
+    set_timens(extractedString, RL_log);
     return 0;
 }
 

@@ -10,7 +10,7 @@
 
 void thread_function(std::vector<entry> send_entries,
                      std::vector<long long> intvals, std::string self_ip,
-                     std::string target_ip, int target_port, std::string logfile, double ghz)
+                     std::string target_ip, int target_port, std::string logfile)
 {
     cpu_set_t mask;
     CPU_ZERO(&mask);
@@ -28,17 +28,20 @@ void thread_function(std::vector<entry> send_entries,
         return;
     }
 
-    std::vector<std::string> sent_buffer;
-
     TSCNS tscns;
     tscns.init();
+    t_sender.tscns = &tscns;
+
+    auto start_cycle = tscns.rdtsc();
+    std::cerr << "start_cycle: " << start_cycle << std::endl;
+    std::cerr << "start_timestamp: " << tscns.tsc2ns(start_cycle) << std::endl;
 
     int i = 0;
     int upper = send_entries.size();
     while (i < upper)
     {
         auto now_cycle = tscns.rdtsc();
-        if (tscns.tsc2ns(now_cycle) >= send_entries[i].timestamp)
+        if (tscns.tsc2ns(now_cycle) - tscns.tsc2ns(start_cycle) >= send_entries[i].timestamp)
         {
             auto send_res = t_sender.send__(send_entries[i].id, send_entries[i].size);
             if (send_res < 0)
@@ -46,32 +49,15 @@ void thread_function(std::vector<entry> send_entries,
                 std::cerr << "send error" << std::endl;
                 break;
             }
-            sent_buffer.push_back(send_entries[i].id);
             i++;
         }
-        // assuming 500 cycle is enough for time conversion
-        else if (tscns.tsc2ns(now_cycle + 500) < send_entries[i].timestamp && !sent_buffer.empty())
-        {
-            auto id = sent_buffer.back();
-            t_sender.update_SL_time(id, tscns.tsc2ns(t_sender.SL_log[id].timestamp));
-            t_sender.update_SR_time(id, tscns.tsc2ns(t_sender.SR_log[id].timestamp));
-            sent_buffer.pop_back();
-        }
-        else if (sent_buffer.empty() && tscns.tsc2ns(now_cycle + 10000000) < send_entries[i].timestamp && !sent_buffer.empty())
+        else if (tscns.tsc2ns(now_cycle + 10000000) < send_entries[i].timestamp)
         {
             tscns.calibrate();
         }
     }
 
     t_sender.disconnect__();
-
-    while (!sent_buffer.empty())
-    {
-        auto id = sent_buffer.back();
-        t_sender.update_SL_time(id, tscns.tsc2ns(t_sender.SL_log[id].timestamp));
-        t_sender.update_SR_time(id, tscns.tsc2ns(t_sender.SR_log[id].timestamp));
-        sent_buffer.pop_back();
-    }
 
     flush(logfile, "SL", t_sender.SL_log);
     flush(logfile, "SR", t_sender.SR_log);
@@ -80,9 +66,9 @@ void thread_function(std::vector<entry> send_entries,
 int main(int argc, char *argv[])
 {
 
-    if (argc != 8)
+    if (argc != 7)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port> <ghz>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port>" << std::endl;
         return 1;
     }
 
@@ -93,8 +79,6 @@ int main(int argc, char *argv[])
     std::string target_ip = argv[4];
     int self_port = std::atoi(argv[5]);
     int target_port = std::atoi(argv[6]);
-
-    double ghz = std::stod(argv[7]);
 
     std::vector<entry> send_entries;
     std::vector<long long> intvals;
@@ -114,7 +98,7 @@ int main(int argc, char *argv[])
         intvals.push_back(nanoseconds);
     }
 
-    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile, ghz);
+    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile);
     t.join();
 
     return 0;
