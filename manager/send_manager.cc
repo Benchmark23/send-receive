@@ -27,16 +27,14 @@ void thread_function(std::vector<entry> send_entries, std::string self_ip,
         return;
     }
 
+    int i = 0;
+    int upper = send_entries.size();
+
     TSCNS tscns;
     tscns.init();
     t_sender.tscns = &tscns;
 
     auto start_cycle = tscns.rdtsc();
-    std::cerr << "start_cycle: " << start_cycle << std::endl;
-    std::cerr << "start_timestamp: " << tscns.tsc2ns(start_cycle) << std::endl;
-
-    int i = 0;
-    int upper = send_entries.size();
     while (i < upper)
     {
         auto now_cycle = tscns.rdtsc();
