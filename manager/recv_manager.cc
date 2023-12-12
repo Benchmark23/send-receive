@@ -7,7 +7,7 @@
 #include "sender.h"
 
 void thread_function(std::vector<entry> recv_entries,
-                     std::string self_ip, int self_port, std::string logfile, int total_time, double ghz)
+                     std::string self_ip, int self_port, std::string logfile, int total_time)
 {
     cpu_set_t mask;
     CPU_ZERO(&mask);
@@ -62,13 +62,10 @@ int main(int argc, char *argv[])
     int self_port = std::atoi(argv[4]);
     int total_time = std::atoi(argv[5]);
 
-    // double ghz = std::stod(argv[6]);
-    double ghz = 1.0;
-
     std::vector<entry> recv_entries;
     parse(taskfile, recv_entries);
 
-    std::thread t(thread_function, recv_entries, self_ip, self_port, logfile, total_time + 3, ghz);
+    std::thread t(thread_function, recv_entries, self_ip, self_port, logfile, total_time + 3);
     t.join();
 
     return 0;
