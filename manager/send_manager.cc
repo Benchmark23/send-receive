@@ -8,8 +8,7 @@
 #include "sender.h"
 #include "tscns.h"
 
-void thread_function(std::vector<entry> send_entries,
-                     std::vector<long long> intvals, std::string self_ip,
+void thread_function(std::vector<entry> send_entries, std::string self_ip,
                      std::string target_ip, int target_port, std::string logfile)
 {
     cpu_set_t mask;
@@ -81,24 +80,9 @@ int main(int argc, char *argv[])
     int target_port = std::atoi(argv[6]);
 
     std::vector<entry> send_entries;
-    std::vector<long long> intvals;
     parse(taskfile, send_entries);
 
-    for (int i = 0; i < send_entries.size(); i++)
-    {
-        long long nanoseconds;
-        if (i == 0)
-        {
-            nanoseconds = (long long)send_entries[i].timestamp;
-        }
-        else
-        {
-            nanoseconds = (long long)(send_entries[i].timestamp - send_entries[i - 1].timestamp);
-        }
-        intvals.push_back(nanoseconds);
-    }
-
-    std::thread t(thread_function, send_entries, intvals, self_ip, target_ip, target_port, logfile);
+    std::thread t(thread_function, send_entries, self_ip, target_ip, target_port, logfile);
     t.join();
 
     return 0;
