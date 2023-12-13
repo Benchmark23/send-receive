@@ -8,13 +8,16 @@
 #include "sender.h"
 #include "tscns.h"
 
-void thread_function(std::vector<entry> send_entries, std::string self_ip,
-                     std::string target_ip, int target_port, std::string logfile)
+void thread_function(std::vector<entry> send_entries, std::string logfile, int cpu_id, int64_t start_time)
 {
     cpu_set_t mask;
     CPU_ZERO(&mask);
-    CPU_SET(0, &mask);
+    CPU_SET(cpu_id, &mask);
     sched_setaffinity(0, sizeof(mask), &mask);
+
+    std::string self_ip = send_entries[0].src_ip;
+    std::string target_ip = send_entries[0].dst_ip;
+    int target_port = send_entries[0].dst_port;
 
     TCPSender t_sender;
     t_sender.ip = self_ip;
@@ -22,17 +25,22 @@ void thread_function(std::vector<entry> send_entries, std::string self_ip,
 
     UDPSender u_sender;
 
-    if (t_sender.connect__(target_ip, target_port) != 0)
-    {
-        return;
-    }
-
     int i = 0;
     int upper = send_entries.size();
 
     TSCNS tscns;
     tscns.init();
     t_sender.tscns = &tscns;
+
+    while(tscns.rdns() < start_time)
+    {
+        // wait to the start time
+    }
+
+    if (t_sender.connect__(target_ip, target_port) != 0)
+    {
+        return;
+    }
 
     auto start_cycle = tscns.rdtsc();
     while (i < upper)
@@ -63,24 +71,22 @@ void thread_function(std::vector<entry> send_entries, std::string self_ip,
 int main(int argc, char *argv[])
 {
 
-    if (argc != 7)
+    if (argc != 5)
     {
-        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <self_ip> <target_ip> <self_port> <target_port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <taskfile> <logfile> <cpu_id> <start_time>" << std::endl;
         return 1;
     }
 
     std::string taskfile = argv[1];
     std::string logfile = argv[2];
-    std::string self_ip = argv[3];
 
-    std::string target_ip = argv[4];
-    int self_port = std::atoi(argv[5]);
-    int target_port = std::atoi(argv[6]);
+    int cpu_id = std::atoi(argv[3]);
+    int64_t start_time = std::atoi(argv[4]);
 
     std::vector<entry> send_entries;
     parse(taskfile, send_entries);
 
-    std::thread t(thread_function, send_entries, self_ip, target_ip, target_port, logfile);
+    std::thread t(thread_function, send_entries, logfile, cpu_id, start_time);
     t.join();
 
     return 0;
